@@ -1,0 +1,199 @@
+TABLE :
+
+EMP(E_ID,NAME,SALARY,CITY,DOB)
+DEP(DID,DNAME)
+WORK(DID,E_ID)
+
+CREATE TABLE EMP
+(
+	E_ID VARCHAR2(5) PRIMARY KEY,
+	NAME VARCHAR2(10), 
+	SALARY NUMBER(7), 
+	CITY VARCHAR2(10), 
+	DOB DATE
+);
+
+INSERT INTO EMP VALUES('E01','AJAY',3000,'KOLKATA','12-JAN-2020');
+INSERT INTO EMP VALUES('E02','ROY',5000,'MUMBAI','1-JUL-2010');
+INSERT INTO EMP VALUES('E03','SAM',7000,'BANGALORE','18-FEB-2012');
+INSERT INTO EMP VALUES('E04','RAM',6000,'KOLKATA','12-JAN-2002');
+INSERT INTO EMP VALUES('E05','BIJAY','4000','PUNE','18-MAY-2007');
+
+CREATE TABLE DEP
+(
+	DID VARCHAR2(5) PRIMARY KEY, 
+	DNAME VARCHAR2(10)
+);
+
+INSERT INTO DEP VALUES('D01','HR');
+INSERT INTO DEP VALUES('D02','IT');
+INSERT INTO DEP VALUES('D03','MARKETTING');
+INSERT INTO DEP VALUES('D04','SALES');
+
+CREATE TABLE WORK
+(
+	DID VARCHAR2(10),
+	E_ID VARCHAR2(10),
+	FOREIGN KEY (DID)REFERENCES DEP(DID) ON DELETE CASCADE, 
+	FOREIGN KEY (E_ID)REFERENCES EMP(E_ID) ON DELETE CASCADE
+);
+
+INSERT INTO WORK VALUES('D01','E01');
+INSERT INTO WORK VALUES('D01','E04');
+INSERT INTO WORK VALUES('D02','E03');
+INSERT INTO WORK VALUES('D03','E01');
+INSERT INTO WORK VALUES('D02','E04');
+INSERT INTO WORK VALUES('D04','E05');
+INSERT INTO WORK VALUES('D04','E02');
+
+Syntax to find the department name(Here DNAME) of a searched employee by joining tables :-
+
+SQL> SELECT DNAME FROM WORK,DEP WHERE DEP.DID=WORK.DID AND WORK.E_ID='E01';
+
+DNAME
+----------
+HR
+MARKETTING
+
+Doing this same work using sub-query :-
+
+SQL> SELECT DNAME FROM DEP WHERE DID IN(SELECT DID FROM WORK WHERE E_ID='E01');
+
+DNAME
+----------
+HR
+MARKETTING
+
+[   Now lets understand this SQL command.
+                                      SELECT DNAME FROM DEP WHERE DID IN(SELECT DID FROM WORK WHERE E_ID='E01');
+                                                                                       ^                            
+                                                                                       |
+                                                                          (This query will respond first)
+As it seems that from this query 'D01' and 'D03' will come out as result. Now the entire query becomes,
+                                      SELECT DNAME FROM DEP WHERE DID IN('D01','D03');
+Which surely gives out 'HR' and 'MARKETTING'   ]
+
+Syntax to find people who works in searched field using bridge :-
+
+SQL> SELECT NAME FROM EMP,DEP,WORK WHERE EMP.E_ID=WORK.E_ID AND DEP.DID=WORK.DID AND DEP.DNAME='IT';
+
+NAME               //In this we wanted to see the name of the employees who work in IT department.
+----------
+SAM
+RAM
+
+Syntax to do the same as above using sub-query :-
+
+SQL> SELECT NAME FROM EMP WHERE E_ID IN(SELECT E_ID FROM WORK WHERE DID IN (SELECT DID FROM DEP WHERE DNAME='IT'));
+
+NAME
+----------
+SAM
+RAM
+
+Concept of Alias Name(NickName) :-
+
+SQL> SELECT NAME FROM EMP E,DEP D,WORK W WHERE E.E_ID=W.E_ID AND D.DID=W.DID AND D.DNAME='IT';  // Now EMP=E, DEP=D and WORK=W
+
+NAME
+----------
+SAM
+RAM
+
+[  Here we give nicknames to the table names so that we do not have to type the whole table name everytime. Note that two nicknames should not match.  ]
+
+Changing field name temporarily :-
+
+SQL> SELECT NAME "EMP NAME" FROM EMP;
+
+EMP NAME
+----------
+AJAY
+ROY
+SAM
+RAM
+BIJAY
+
+Give out the department name of those employees who live in kolkata :-
+
+Using sub-query :
+
+SQL> SELECT DNAME FROM DEP WHERE DID IN(SELECT DID FROM WORK WHERE E_ID IN(SELECT E_ID FROM EMP WHERE CITY='KOLKATA'));
+
+DNAME
+----------
+MARKETTING
+IT
+HR
+
+Using bridge :
+
+SQL> SELECT DNAME FROM DEP,EMP,WORK WHERE DEP.DID=WORK.DID AND WORK.E_ID=EMP.E_ID AND EMP.CITY='KOLKATA';
+
+DNAME
+----------
+HR
+HR
+MARKETTING
+IT
+
+[  Now here comes out this problem that it is showing the department name HR twice because two employees from kolkata works in HR department. To solve this problem we can use distinct keyword which in turn gives out the names only once. Lets see how it works.  ]
+
+SQL> SELECT DISTINCT DNAME FROM DEP,EMP,WORK WHERE DEP.DID=WORK.DID AND WORK.E_ID=EMP.E_ID AND EMP.CITY='KOLKATA';
+
+DNAME
+----------
+IT
+HR
+MARKETTING
+
+The utility of ON DELETE CASCADE :-
+
+SQL> DELETE FROM EMP WHERE E_ID='E05';
+
+1 row deleted.
+
+SQL> SELECT * FROM EMP;
+
+E_ID  NAME           SALARY CITY       DOB
+----- ---------- ---------- ---------- ---------
+E01   AJAY             3000 KOLKATA    12-JAN-20
+E02   ROY              5000 MUMBAI     01-JUL-10
+E03   SAM              7000 BANGALORE  18-FEB-12
+E04   RAM              6000 KOLKATA    12-JAN-02
+
+SQL> SELECT * FROM WORK;         //Deleted the employee E05 from EMP table.
+
+DID        E_ID                  //All records of E05 from here is also deleted automatically because of that ON DELETE CASCADE.
+---------- ----------
+D01        E01
+D01        E04
+D02        E03
+D03        E01
+D02        E04
+D04        E02
+D04        E03
+
+7 rows selected.
+
+Dropping these tables :-
+
+SQL> DROP TABLE EMP;
+DROP TABLE EMP
+           *
+ERROR at line 1:
+ORA-02449: unique/primary keys in table referenced by foreign keys
+
+[  The work table has the foreign key which is the primary key of the EMP table. So, we can say that the EMP table is the parent table and the work table is the child table of it. So, without deleting the child table we cannot delete the parent table. Here we can use DELETE command to delete each row of the parent table but if you notice you will see that in this way only the rows of the table will be deleted but the table will not be deleted.  ]
+
+SQL> DROP TABLE WORK;      //First child is dropped.
+
+Table dropped.
+
+SQL> DROP TABLE DEP;
+
+Table dropped.
+
+SQL> DROP TABLE EMP;      //Then parent is dropped.
+
+Table dropped.

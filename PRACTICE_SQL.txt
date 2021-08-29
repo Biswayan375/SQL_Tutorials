@@ -1,0 +1,301 @@
+1.  EMPLOYEE(EID,ENAME,GENDER,AGE,CITY)
+    DEPARTMENT(DID,DNAME,LOCATION)
+    WORKS(EID,DID,DATE-FROM,DATE-TO)
+
+Create the above relations through SQL commands specifying integrity constraints. insert sufficient records in each table so that the following queries yield results.
+(a) List all employees having surname "Das" from "Kolkata" who work in "Tech support" department located in "Pune".
+(b) Display the names of all departments situated in "Trivandrum" which have less than 3 employees working in it.
+(c) Give the list of all female employees working in "Marketting" who have started work in 2016.
+
+ANS=>
+
+CREATE TABLE EMPLOYEE
+(
+	EID VARCHAR2(5) PRIMARY KEY,
+	ENAME VARCHAR2(20) NOT NULL,
+	GENDER VARCHAR2(11) NOT NULL,
+	AGE NUMBER(3) NOT NULL,
+	CITY VARCHAR2(15) NOT NULL,
+	CHECK(AGE>=18)
+);
+
+INSERT INTO EMPLOYEE VALUES('E01','PRATIK DAS','MALE',18,'KOLKATA');
+INSERT INTO EMPLOYEE VALUES('E02','SUCHETA MITRA','FEMALE',22,'MUMBAI');
+INSERT INTO EMPLOYEE VALUES('E03','EMILY MISHRA','FEMALE',20,'CHENNAI');
+INSERT INTO EMPLOYEE VALUES('E04','SOMNATH DAS','MALE',19,'DELHI');
+INSERT INTO EMPLOYEE VALUES('E05','PRITHA DAS','FEMALE',20,'KOLKATA');
+INSERT INTO EMPLOYEE VALUES('E06','KAPIL SHARMA','MALE',21,'MUMBAI');
+INSERT INTO EMPLOYEE VALUES('E07','ROHINI PATEL','FEMALE',22,'DELHI');
+
+EID   ENAME                GENDER             AGE CITY
+----- -------------------- ----------- ---------- ---------------
+E01   PRATIK DAS           MALE                18 KOLKATA
+E02   SUCHETA MITRA        FEMALE              22 MUMBAI
+E03   EMILY MISHRA         FEMALE              20 CHENNAI
+E04   SOMNATH DAS          MALE                19 DELHI
+E05   PRITHA DAS           FEMALE              20 KOLKATA
+E06   KAPIL SHARMA         MALE                21 MUMBAI
+E07   ROHINI PATEL         FEMALE              22 DELHI
+
+CREATE TABLE DEPARTMENT
+(
+	DID VARCHAR2(5) PRIMARY KEY,
+	DNAME VARCHAR2(20) NOT NULL,
+	LOCATION VARCHAR2(10) NOT NULL
+);
+
+INSERT INTO DEPARTMENT VALUES('D01','TECH-SUPPORT','PUNE');
+INSERT INTO DEPARTMENT VALUES('D02','HEAD OFFICE','TRIVANDRUM');
+INSERT INTO DEPARTMENT VALUES('D03','IT','BENGALURU');
+INSERT INTO DEPARTMENT VALUES('D04','MARKETTING','TRIVANDRUM');
+
+DID   DNAME                LOCATION
+----- -------------------- ----------
+D01   TECH-SUPPORT         PUNE
+D02   HEAD OFFICE          TRIVANDRUM
+D03   IT                   BENGALURU
+D04   MARKETTING           TRIVANDRUM
+
+CREATE TABLE WORKS
+(
+	EID VARCHAR2(5),
+	DID VARCHAR2(5),
+	FOREIGN KEY (EID) REFERENCES EMPLOYEE(EID) ON DELETE CASCADE,
+	FOREIGN KEY (DID) REFERENCES DEPARTMENT(DID) ON DELETE CASCADE,
+	JOIN DATE NOT NULL,
+	RETIRE DATE NOT NULL
+);
+
+INSERT INTO WORKS VALUES('E01','D01','12-DEC-2010','2-DEC-2030');
+INSERT INTO WORKS VALUES('E06','D01','16-JUN-2011','12-FEB-2030');
+INSERT INTO WORKS VALUES('E04','D02','20-JAN-2012','14-OCT-2031');
+INSERT INTO WORKS VALUES('E05','D02','29-JUL-2010','14-DEC-2030');
+INSERT INTO WORKS VALUES('E07','D02','22-MAR-2011','12-APR-2030');
+INSERT INTO WORKS VALUES('E02','D03','14-JAN-2016','14-SEP-2033');
+INSERT INTO WORKS VALUES('E03','D03','20-JAN-2014','14-OCT-2032');
+
+EID   DID   JOIN      RETIRE
+----- ----- --------- ---------
+E01   D01   12-DEC-10 02-DEC-30
+E06   D01   16-JUN-11 12-FEB-30
+E04   D02   20-JAN-12 14-OCT-31
+E05   D02   29-JUL-10 14-DEC-30
+E07   D02   22-MAR-11 12-APR-30
+E02   D03   14-JAN-16 14-SEP-33
+E03   D03   20-JAN-14 14-OCT-32
+
+(a)
+ SELECT ENAME FROM EMPLOYEE WHERE ENAME LIKE '%DAS' AND EID IN(SELECT EID FROM WORKS WHERE DID IN(SELECT DID FROM DEPARTMENT WHERE DNAME='TECH-SUPPORT' AND LOCATION='PUNE'));
+
+ENAME
+--------------------
+PRATIK DAS
+
+(b)
+SQL> SELECT DNAME  FROM DEPARTMENT WHERE LOCATION='TRIVANDRUM' AND DID IN(SELECT DID FROM WORKS GROUP BY DID HAVING COUNT(EID)<3);
+
+DNAME
+--------------------
+MARKETTING
+
+(c)
+SQL> SELECT ENAME FROM EMPLOYEE E,DEPARTMENT D,WORKS W WHERE E.EID=W.EID AND D.DID=W.DID AND GENDER='FEMALE' AND DNAME='MARKETTING' AND JOIN BETWEEN '1-JAN-2016' AND '31-DEC-2016';
+
+ENAME
+--------------------
+SUCHETA MITRA
+
+
+2.  TABLES:
+
+
+
+CREATE TABLE ACTOR
+(
+	AID VARCHAR2(5) PRIMARY KEY,
+	ANAME VARCHAR2(20),
+	SEX VARCHAR2(12),
+	AGE NUMBER(3),
+	INDUSTRY_EXP VARCHAR2(13)
+);
+
+CREATE TABLE SERIES
+(
+	TID VARCHAR2(5) PRIMARY KEY,
+	SNAME VARCHAR2(30),
+	TYPE VARCHAR2(20),
+	RATING NUMBER(10),
+	NETWORK VARCHAR2(20)
+);
+
+CREATE TABLE ACTS
+(
+	AID VARCHAR2(5),
+	TID VARCHAR2(5),
+	DATE_TO DATE,
+	DATE_FROM DATE,
+	NO_OF_SEASONS NUMBER(11),
+	PRIMARY KEY(AID,TID)
+);
+
+
+
+     VALUE INSERTION :
+
+
+FOR ACTOR TABLE ::
+INSERT INTO ACTOR VALUES('A01','NANDITA ROY','FEMALE','30','10YRS');
+INSERT INTO ACTOR VALUES('A02','SUMIT SINHA','MALE',52,'15YRS');
+INSERT INTO ACTOR VALUES('A03','SIMA DAS','FEMALE',25,'5YRS');
+INSERT INTO ACTOR VALUES('A04','SAMAR DEY','MALE',32,'2YRS');
+INSERT INTO ACTOR VALUES('A05','REKHA SINGH','FEMALE',65,'25YRS');
+INSERT INTO ACTOR VALUES('A06','PUSPA DAS','FEMALE',32,'6YRS');
+
+FOR SERIES TABLE ::
+INSERT INTO SERIES VALUES('T01','FLAMES','TRAGIC',10,'NETFLIX');
+INSERT INTO SERIES VALUES('T02','GREY MATTER','DOCUMENTARY',9,'NETFLIX');
+INSERT INTO SERIES VALUES('T03','HUMPTY DUMPTY','COMEDY',7,'CARTOON NETWORK');
+INSERT INTO SERIES VALUES('T04','THAT SMELL','THRILLER',9.5,'NETFLIX');
+INSERT INTO SERIES VALUES('T05','BOSE','DOCUMENTARY',8.5,'NETFLIX');
+INSERT INTO SERIES VALUES('T06','FLAMES','CARTOON',9.8,'DISNEY');
+
+FOR ACTS TABLE ::
+INSERT INTO ACTS VALUES('A01','T02','1-JAN-2019','25-AUG-2013',12);
+INSERT INTO ACTS VALUES('A03','T02','15-FEB-2019','10-AUG-2013',12);
+INSERT INTO ACTS VALUES('A02','T04','9-JAN-2016','14-JUN-2010',15);
+INSERT INTO ACTS VALUES('A05','T01','25-JUL-2019','10-MAR-2009',10);
+INSERT INTO ACTS VALUES('A04','T03','21-FEB-2019','16-JAN-2019',8);
+INSERT INTO ACTS VALUES('A06','T02','20-AUG-2019','16-JAN-2009',16);
+
+SQL> SELECT * FROM ACTOR;
+
+AID   ANAME                SEX                 AGE INDUSTRY_EXP
+----- -------------------- ------------ ---------- -------------
+A01   NANDITA ROY          FEMALE               30 10YRS
+A02   SUMIT SINHA          MALE                 52 15YRS
+A03   SIMA DAS             FEMALE               25 5YRS
+A04   SAMAR DEY            MALE                 32 2YRS
+A05   REKHA SINGH          FEMALE               65 25YRS
+A06   PUSPA DAS            FEMALE               32 6YRS
+
+6 rows selected.
+
+SQL> SELECT * FROM SERIES;
+
+TID   SNAME                          TYPE                     RATING NETWORK
+----- ------------------------------ -------------------- ---------- --------------------
+T01   FLAMES                         TRAGIC                       10 NETFLIX
+T02   GREY MATTER                    DOCUMENTARY                   9 NETFLIX
+T03   HUMPTY DUMPTY                  COMEDY                        7 CARTOON NETWORK
+T04   THAT SMELL                     THRILLER                     10 NETFLIX
+T05   BOSE                           DOCUMENTARY                   9 NETFLIX
+T06   FLAMES                         CARTOON                      10 DISNEY
+
+6 rows selected.
+
+SQL> SELECT * FROM ACTS;
+
+AID   TID   DATE_TO   DATE_FROM NO_OF_SEASONS
+----- ----- --------- --------- -------------
+A01   T02   01-JAN-19 25-AUG-13            12
+A03   T02   15-FEB-19 10-AUG-13            12
+A02   T04   09-JAN-16 14-JUN-10            15
+A05   T01   25-JUL-19 10-MAR-09            10
+A04   T03   21-FEB-19 16-JAN-19             8
+A06   T02   20-AUG-19 16-JAN-09            16
+
+
+     QUERIES :
+
+(a) Count the number of series showcasing on NETFLIX network with a rating greater than 8 and a type DOCUMENTARY.
+
+ANS=>
+SQL> SELECT COUNT(*) FROM SERIES WHERE NETWORK='NETFLIX' AND RATING>8 AND TYPE='DOCUMENTARY';
+
+  COUNT(*)
+----------
+         2
+
+(b) List the name of female actors within the age gap 25 to 35, who have acted in a TV series with the word 'Grey' in it and has been running for 10 season or more.
+
+ANS=>
+SQL> SELECT ANAME FROM ACTOR WHERE SEX='FEMALE' AND AGE BETWEEN 25 AND 35 AND AID IN(SELECT AID FROM ACTS WHERE NO_OF_SEASONS>10 AND TID IN(SELECT TID FROM SERIES WHERE SNAME LIKE '%GREY%'));
+
+ANAME
+--------------------
+NANDITA ROY
+SIMA DAS
+PUSPA DAS
+
+(c) Find the name of male actor who has acted in a TV series for the maximum possible duration.
+
+ANS=>
+SQL> SELECT ANAME FROM ACTOR WHERE SEX='MALE' AND AID IN(SELECT AID FROM ACTS WHERE (DATE_FROM-DATE_TO)=(SELECT MAX(DATE_FROM-DATE_TO) FROM ACTS));
+
+ANAME
+--------------------
+SAMAR DEY
+
+3. TABLES :
+
+
+create table Bank
+(
+BCode varchar2(5) primary key,
+Bankname varchar2(20),
+Branch varchar2(30),
+City varchar2(30)
+);
+
+create table Customer
+(
+CustID varchar2(5) primary key,
+CName varchar2(30),
+ACtype varchar2(20),
+Balance number(20),
+Age number(3)
+);
+
+create table Transaction 
+(
+TID varchar2(5) primary key,
+BCode varchar2(5),
+CustID varchar2(5),
+transtype varchar2(20),
+tdate date,
+amount number(20)
+);
+
+FOR BANK TABLE-
+insert into Bank values('b01','uco bank','behala','kolkata');
+insert into Bank values('b02','hdfc bank','beldanga','haldia');
+insert into Bank values('b03','state bank','jorabagan','haldia');
+insert into Bank values('b04','axis bank','narkeldanga','kolkata');
+insert into Bank values('b05','hdfc bank','notun para','haldia');
+insert into Bank values('b06','bank of baroda','sodepur','kolkata');
+
+FOR CUSTOMER TABLE-
+insert into Customer values('c01','Pramila Nag','savings',100000,25);
+insert into Customer values('c02','Adesh Sarkar','current',500000,52);
+insert into Customer values('c03','Pritam Naskar','savings',20000,29);
+insert into Customer values('c04','Biswajit Saha','savings',600000,24);
+insert into Customer values('c05','Niladri Sen','current',400000,42);
+insert into Customer values('c06','Pritha Nandi','savings',60000,30);
+
+FOR TRANSACTION TABLE-
+insert into Transaction values('t01','b02','c01','credit','15-feb-2019',5600);
+insert into Transaction values('t02','b01','c02','credit','10-nov-2017',100000);
+insert into Transaction values('t03','b05','c03','cheque','12-jul-2014',9000);
+insert into Transaction values('t04','b01','c04','credit','12-mar-2017',20000);
+insert into Transaction values('t05','b06','c06','deposit','25-jan-2018',11000);
+insert into Transaction values('t06','b01','c05','credit','12-dec-2017',70000);
+
+(a) List all banks having more than one branch in haldia.
+ANS=>
+SQL> SELECT BANKNAME FROM BANK WHERE CITY='haldia' GROUP BY BANKNAME HAVING COUNT(BRANCH)>1;
+
+BANKNAME
+--------------------
+hdfc bank
+
+(b) Name all customers with initials "P.N.",(i.e. name starts with 'P' and surname with 'N'),below the age of 30,who have made a transaction of amount between Rs.5000/- and Rs.10,000/-.

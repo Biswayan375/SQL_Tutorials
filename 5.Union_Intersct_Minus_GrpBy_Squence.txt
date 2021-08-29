@@ -1,0 +1,250 @@
+TABLES ARE :-
+
+EMP Table :
+E_ID  NAME           SALARY CITY       DOB
+----- ---------- ---------- ---------- ---------
+E01   AJAY             3000 KOLKATA    12-JAN-20
+E02   ROY              5000 MUMBAI     01-JUL-10
+E03   SAM              7000 BANGALORE  18-FEB-12
+E04   RAM              6000 KOLKATA    12-JAN-02
+E05   BIJAY            4000 PUNE       18-MAY-07
+
+DEP Table :
+DID   DNAME
+----- ----------
+D01   HR
+D02   IT
+D03   MARKETTING
+D04   SALES
+
+WORK Table :
+DID        E_ID
+---------- ----------
+D01        E01
+D01        E04
+D02        E03
+D03        E01
+D02        E04
+D04        E05
+D04        E02
+D04        E03
+
+Syntax to find the number of employees work in each department :-
+
+SQL> SELECT DID,COUNT(E_ID) FROM WORK GROUP BY DID;
+
+DID        COUNT(E_ID)
+---------- -----------
+D03                  1
+D02                  2
+D01                  2
+D04                  3
+
+SQL> SELECT COUNT(E_ID) FROM WORK GROUP BY DID;
+
+COUNT(E_ID)
+-----------
+          1
+          2
+          2
+          3
+
+[  Now this syntax only shows the number of employees work in each department but without the department ID.  ]
+
+SQL> SELECT MAX(COUNT(E_ID)) FROM WORK GROUP BY DID;
+
+MAX(COUNT(E_ID))
+----------------
+               3
+
+[  This shows the maximum number of employees work in a department but without the department ID.  ]
+
+Syntax to show the departments and the number of employees work in those if the number is greater or lesser than a searched value :-
+
+SQL> SELECT DID,COUNT(E_ID) FROM WORK GROUP BY DID HAVING COUNT(E_ID)>2;
+
+//This having clause can only be used after group by clause.
+DID        COUNT(E_ID)                
+---------- -----------
+D04                  3
+
+Syntax to find the name of department in which most number of employees work using sub-query :-
+
+SQL> SELECT DNAME FROM DEP WHERE DID IN(SELECT DID FROM WORK GROUP BY DID HAVING COUNT(E_ID) IN(SELECT MAX(COUNT(E_ID)) FROM WORK GROUP BY DID));
+
+DNAME
+----------
+SALES
+
+Concept of constraints :-
+
+TABLE :
+
+CREATE TABLE STUDENT
+(
+	ROLL NUMBER(5) PRIMARY KEY,       
+	FNAME VARCHAR2(10) NOT NULL,      
+	LNAME VARCHAR2(10) NOT NULL,
+	AGE NUMBER(3),
+	CITY VARCHAR2(10),
+	CHECK(AGE>=18)                    
+);
+
+// ROLL as primary key - Because ROLL NO. of a student is his/her unique identity to the institution,
+// NOT NULL - This is not defined as primary key but like a primary key this field can also not be left blank.
+// CHECK operator - If age is greater than or equal to 18 the only it will not show an error otherwise the outuput will be error.
+
+CREATING A SEQUENCE :
+
+CREATE SEQUENCE ID
+	MINVALUE 1
+	START WITH 1
+	INCREMENT BY 1
+	CACHE 10;
+
+INPUT :
+
+INSERT INTO STUDENT VALUES(ID.NEXTVAL,'AJAY','SAHA','19','KOLKATA');
+INSERT INTO STUDENT VALUES(ID.NEXTVAL,'AKASH','ROY','22','MUMBAI');
+INSERT INTO STUDENT VALUES(ID.NEXTVAL,'BIKASH','DAS','21','DELHI');
+INSERT INTO STUDENT VALUES(ID.NEXTVAL,'RIYA','SEN','20','PUNE');
+INSERT INTO STUDENT VALUES(ID.NEXTVAL,'SUPRIYO','SARKAR','22','KOLKATA');
+
+     ROLL FNAME      LNAME             AGE CITY
+---------- ---------- ---------- ---------- ----------
+         1 AJAY       SAHA               19 KOLKATA
+         2 AKASH      ROY                22 MUMBAI
+         3 BIKASH     DAS                21 DELHI
+         4 RIYA       SEN                20 PUNE
+         5 SUPRIYO    SARKAR             22 KOLKATA
+ROLL NO. automatically generated due to that sequence and if you notice, we took ID.NEXTVAL in the place of ROLL as we wanted to automatically generate that field.
+
+Syntax to view the name of the students :-
+
+SQL> SELECT FNAME,LNAME FROM STUDENT;
+
+FNAME      LNAME
+---------- ----------
+AJAY       SAHA
+AKASH      ROY
+BIKASH     DAS
+RIYA       SEN
+SUPRIYO    SARKAR
+
+But if we want to see it in the same field then we can do it like this.
+
+SQL> SELECT (FNAME||LNAME) "NAME" FROM STUDENT;
+
+NAME
+--------------------
+AJAYSAHA
+AKASHROY
+BIKASHDAS
+RIYASEN
+SUPRIYOSARKAR
+
+To overcome the space problem we can do this.
+
+SQL> SELECT (FNAME||' '||LNAME) "NAME" FROM STUDENT;
+
+NAME
+---------------------
+AJAY SAHA
+AKASH ROY
+BIKASH DAS
+RIYA SEN
+SUPRIYO SARKAR
+
+Concept of union, intersection and minus :-
+
+TABLE :
+
+CREATE TABLE TEACHER
+(
+	TID VARCHAR2(10),
+	NAME VARCHAR2(10),
+	SUBJECT VARCHAR2(20)
+);
+
+INSERT INTO TEACHER VALUES('T01','BISWAJIT','DBMS');
+INSERT INTO TEACHER VALUES('T01','SUPRIYO','NETWORKING');
+INSERT INTO TEACHER VALUES('T03','KAUSHIK','C');
+INSERT INTO TEACHER VALUES('T04','SREYASHI','MICROPROCESSOR');
+
+CREATE TABLE FAV_TEACHER
+(
+	ROLL NUMBER(5),
+	TID VARCHAR2(10)
+);
+
+INSERT INTO FAV_TEACHER VALUES(1,'T02');
+INSERT INTO FAV_TEACHER VALUES(1,'T01');
+INSERT INTO FAV_TEACHER VALUES(2,'T04');
+INSERT INTO FAV_TEACHER VALUES(3,'T02');
+INSERT INTO FAV_TEACHER VALUES(2,'T03');
+INSERT INTO FAV_TEACHER VALUES(4,'T01');
+
+TID        NAME       SUBJECT
+---------- ---------- --------------------
+T01        BISWAJIT   DBMS
+T01        SUPRIYO    NETWORKING
+T03        KAUSHIK    C
+T04        SREYASHI   MICROPROCESSOR
+
+     ROLL TID
+---------- ----------
+         1 T02
+         1 T01
+         2 T04
+         3 T02
+         2 T03
+         4 T01
+
+SQL> SELECT FNAME FROM STUDENT UNION SELECT NAME FROM TEACHER;
+
+FNAME
+----------
+AJAY
+AKASH
+BIKASH
+BISWAJIT
+KAUSHIK
+RIYA
+SREYASHI
+SUPRIYO
+
+[  As supriyo is in the student table and also in the teachers table, so, in the case of union his name displayed only once.  ]
+
+SQL> SELECT  FNAME "NAME" FROM STUDENT INTERSECT SELECT NAME FROM TEACHER;
+
+NAME
+----------
+SUPRIYO
+
+[  As supriyo is the common name, so, in the case of intersection, only his name is displayed.  ]
+
+SQL> SELECT (FNAME||' '||LNAME) "NAME" FROM STUDENT S,FAV_TEACHER F WHERE F.ROLL=S.ROLL AND F.TID='T02';
+
+NAME
+---------------------
+AJAY SAHA
+BIKASH DAS
+
+[  Now this command gives out the the name of the students whose favourite teacher is supriyo. But what if when the question is give the name of the students whose favourite teacher is only supriyo but not biswajit. Here comes the concept of minus operator. If you notice the table you will find that AJAY SAHA's favourite teacher is not only supriyo but also biswajit.So we can do this like this way.  ]
+
+SQL>  SELECT (FNAME||' '||LNAME) "NAME" FROM STUDENT S,FAV_TEACHER F WHERE F.ROLL=S.ROLL AND F.TID='T02' MINUS  SELECT (FNAME||' '||LNAME) "NAME" FROM STUDENT S,FAV_TEACHER F WHERE F.ROLL=S.ROLL AND F.TID='T01';
+
+NAME
+---------------------
+BIKASH DAS
+
+[  First this command takes the names of the student whose favourite teacher is biswajit and then it takes the name of the students whose favourite teacher is supriyo and then does the minus operation after that the same names from that two output are eliminated and there left only the names whose favourite teacher is only supriyo but not biswajit.  ]
+
+SQL>  SELECT (FNAME||' '||LNAME) "NAME" FROM STUDENT S,FAV_TEACHER F,TEACHER T WHERE S.ROLL=F.ROLL AND T.TID=F.TID AND NAME='SUPRIYO' MINUS SELECT (FNAME||' '||LNAME) "NAME" FROM STUDENT S,FAV_TEACHER F,TEACHER T WHERE S.ROLL=F.ROLL AND T.TID=F.TID AND NAME<>'SUPRIYO';
+
+NAME
+---------------------
+BIKASH DAS
+
+[  Now this command minuses the list of students whose favourite teacher is supriyo with the list of students whose favourite teacher is not supriyo giving out the result of the list of the students whose favourite teacher is only supriyo.  ]
+

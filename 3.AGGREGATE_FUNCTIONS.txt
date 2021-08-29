@@ -1,0 +1,266 @@
+Aggregate functions are never to be used after where clause without any group by function. It can only be used after the select keyword and only with group by after where clause. max, min, avg, count, sum and distinct are the aggregate functions.
+
+
+The Table is :-
+
+INSERT INTO EMP VALUES('E01','AJAY',3000,'KOLKATA','12-JAN-2020');
+INSERT INTO EMP VALUES('E02','ROY',5000,'MUMBAI','1-JUL-2010');
+INSERT INTO EMP VALUES('E03','SAM',7000,'BANGALORE','18-FEB-2012');
+INSERT INTO EMP VALUES('E04','RAM',6000,'KOLKATA','12-JAN-2002');
+INSERT INTO EMP VALUES('E05','BIJAY','4000','PUNE','18-MAY-2007');
+
+E_ID       NAME                     SALARY CITY       DOB
+---------- -------------------- ---------- ---------- ---------
+E01        AJAY                       3000 KOLKATA    12-JAN-20
+E02        ROY                        5000 MUMBAI     01-JUL-10
+E03        SAM                        7000 BANGALORE  18-FEB-12
+E04        RAM                        6000 KOLKATA    10-JAN-02
+
+Syntax to know the highest, lowest, total salary and average salary given to the employees :-
+SQL> SELECT MAX(SALARY) FROM EMP;
+
+MAX(SALARY)
+-----------
+       7000
+SQL> SELECT MIN(SALARY) FROM EMP;
+
+MIN(SALARY)
+-----------
+       3000
+SQL> SELECT SUM(SALARY) FROM EMP;
+
+SUM(SALARY)
+-----------
+      21000
+SQL> SELECT AVG(SALARY) FROM EMP;
+
+AVG(SALARY)
+-----------
+       5250
+
+Syntax of counting the number of employees :-
+SQL> SELECT COUNT(E_ID) FROM EMP;
+
+COUNT(E_ID)                   //As E_ID is primary and unique for every employee, the number of E_IDs is the number of total employees.
+-----------
+          4
+Or,
+SQL> SELECT COUNT(*) FROM EMP;
+
+  COUNT(*)                    //The number of rows is the number of employees also.
+----------
+         4
+Syntax to know the data of the employee who is paid maximum and minimum salary :-
+SQL> SELECT E_ID, NAME, CITY, DOB FROM EMP WHERE SALARY=(SELECT MAX(SALARY) FROM EMP);   //We cannot use aggregate functions after where so we use sub-query
+
+E_ID       NAME                 CITY       DOB
+---------- -------------------- ---------- ---------
+E03        SAM                  BANGALORE  18-FEB-12
+
+SQL>  SELECT E_ID, NAME, CITY, DOB FROM EMP WHERE SALARY=(SELECT MIN(SALARY) FROM EMP);  //Or we can also write it as ...WHERE SALARY IN (SELECT MIN(SALARY) FROM EMP);
+
+E_ID       NAME                 CITY       DOB
+---------- -------------------- ---------- ---------
+E01        AJAY                 KOLKATA    12-JAN-20
+
+Syntax to get the data of the employees who are not paid the maximum and minimum salary :-
+
+SQL> SELECT E_ID, NAME, CITY, DOB FROM EMP WHERE SALARY NOT IN(SELECT MAX(SALARY) FROM EMP);   
+
+//SAM was highest paid employee. So, he is not in this list.
+E_ID       NAME                 CITY       DOB                                      
+---------- -------------------- ---------- ---------
+E01        AJAY                 KOLKATA    12-JAN-20
+E02        ROY                  MUMBAI     01-JUL-10
+E04        RAM                  KOLKATA    10-JAN-02
+SQL>  SELECT E_ID, NAME, CITY, DOB FROM EMP WHERE SALARY NOT IN(SELECT MIN(SALARY) FROM EMP);
+
+//AJAY was lowest paid employee. So, he is not in this list.
+E_ID       NAME                 CITY       DOB                                      
+---------- -------------------- ---------- ---------
+E02        ROY                  MUMBAI     01-JUL-10
+E03        SAM                  BANGALORE  18-FEB-12
+E04        RAM                  KOLKATA    10-JAN-02
+
+Syntax to get the data of the employee who is paid the second highest and second lowest salary :-
+
+SQL> SELECT E_ID, NAME, CITY, DOB FROM EMP WHERE SALARY IN(SELECT MAX(SALARY) FROM EMP WHERE SALARY NOT IN (SELECT MAX(SALARY) FROM EMP));
+
+E_ID       NAME                 CITY       DOB
+---------- -------------------- ---------- ---------
+E04        RAM                  KOLKATA    10-JAN-02
+
+[	Now lets understand the SQL command :	SELECT E_ID, NAME, CITY, DOB FROM EMP WHERE SALARY IN(SELECT MAX(SALARY) FROM EMP WHERE SALARY NOT IN (SELECT MAX(SALARY) FROM EMP));
+                                                                                                     ^                                                ^                           ^^
+                                                                                                     |                                                |                           ||
+                                                                                                     1                                                2                           21
+                                                                                                (1 starts)                                        (2 starts)               (2 Ends)(1 Ends)
+
+Here first the no.2 sub-query works and as it says, the highest salary is sorted out. Then the no.1 sub-query comes to work and this time the highest salary is already out of the table, so, here left only the second highest salary which is now sorted out and here the whole operation stops. Similarly we can find the second lowest payment also which is given below.       ]
+
+SQL> SELECT E_ID, NAME, CITY, DOB FROM EMP WHERE SALARY IN(SELECT MIN(SALARY) FROM EMP WHERE SALARY NOT IN(SELECT MIN(SALARY) FROM EMP));
+
+E_ID       NAME                 CITY       DOB
+---------- -------------------- ---------- ---------
+E02        ROY                  MUMBAI     01-JUL-10
+
+Syntax to extract only day, year or month from DOB :-
+
+SQL> SELECT EXTRACT(YEAR FROM DOB) FROM EMP;
+
+EXTRACT(YEARFROMDOB)
+--------------------
+                2020
+                2010
+                2012
+                2002
+SQL> SELECT EXTRACT(MONTH FROM DOB) FROM EMP;
+
+EXTRACT(MONTHFROMDOB)
+---------------------
+                    1
+                    7
+                    2
+                    1
+SQL> SELECT EXTRACT(DAY FROM DOB) FROM EMP;
+
+EXTRACT(DAYFROMDOB)
+-------------------
+                 12
+                  1
+                 18
+                 10
+
+Finding out details of the employee getting highest payment and lowest payment without aggregate function :-
+
+SQL> SELECT E_ID, NAME, CITY, DOB FROM EMP WHERE SALARY>=ALL(SELECT SALARY FROM EMP);
+
+E_ID       NAME                 CITY       DOB
+---------- -------------------- ---------- ---------
+E03        SAM                  BANGALORE  18-FEB-12
+
+SQL> SELECT E_ID, NAME, CITY, DOB FROM EMP WHERE SALARY<=ALL(SELECT SALARY FROM EMP);
+
+E_ID       NAME                 CITY       DOB
+---------- -------------------- ---------- ---------
+E01        AJAY                 KOLKATA    12-JAN-20
+
+Finding the details of the employee getting a payment which is greater than any other employee using and not using aggregate functions :-
+
+Using aggregate function :
+SQL> SELECT E_ID, NAME, CITY, DOB FROM EMP WHERE SALARY !=(SELECT MIN(SALARY) FROM EMP);
+
+//Only Ajay's salary is not greater than any other, so, it is not listed here.
+E_ID       NAME                 CITY       DOB                 
+---------- -------------------- ---------- ---------
+E02        ROY                  MUMBAI     01-JUL-10
+E03        SAM                  BANGALORE  18-FEB-12
+E04        RAM                  KOLKATA    10-JAN-02
+
+Not using aggregate function :
+SQL> SELECT E_ID, NAME, CITY, DOB FROM EMP WHERE SALARY>ANY(SELECT SALARY FROM EMP);
+
+E_ID       NAME                 CITY       DOB
+---------- -------------------- ---------- ---------
+E02        ROY                  MUMBAI     01-JUL-10
+E03        SAM                  BANGALORE  18-FEB-12
+E04        RAM                  KOLKATA    10-JAN-02
+
+Finding the details of the employees whose DOB is between 2012-20 :-
+
+SQL> SELECT * FROM EMP WHERE DOB BETWEEN '1-JAN-2012' AND '31-DEC-2020';
+
+E_ID       NAME                     SALARY CITY       DOB
+---------- -------------------- ---------- ---------- ---------
+E01        AJAY                       3000 KOLKATA    12-JAN-20
+E03        SAM                        7000 BANGALORE  18-FEB-12
+
+
+
+
+--EXTRA ADDITIONS (Today's date: Saturday 28, 2021)
+***All the below operations are done on the table shown in './queries.sql'***
+
+1. Find out the age of an employee.
+ANS: 
+select trunc((sysdate-(select dob from employee where e_id='E07'))/365) as age_of_ajay from dual;
+
+[ i. trunc() function is the round() function
+ii. 'select sysdate from dual;' gives system date from dual which is a buffer ]
+
+2. Show the name and ages of every employee.
+ANS:
+select name, (
+	trunc(
+		((select sysdate from dual)-dob)/365
+	)
+) as age from employee;
+
+3. Find out the oldest employee in the company.
+ANS:
+----------------------------------------------
+Method1:(Pretty lengthy one but comprehensive)
+----------------------------------------------
+-- This query finds out the maximum age 
+	select max(
+		trunc(
+			((select sysdate from dual)-dob)/365
+		)
+	) from employee;
+	
+	--Incorporating the above query with the main query to show all the details of the oldest employee that looks like: select * from employee where age = max(age);
+	select * from employee where trunc(
+			((select sysdate from dual)-dob)/365
+		) = (select max(
+		trunc(
+			((select sysdate from dual)-dob)/365
+		)
+	) from employee);
+
+-------------------------
+Method2:(Naive and short)
+-------------------------
+-- This one selects the 1st row from the table that is ordered by dob in ascending order
+select * from 
+	(select * from employee order by dob) 
+	where rownum <= 1;
+
+4. Understanding all and any.
+ANS: 
+select * from employee where salary <= all(select salary from employee);
+
+The above query runs something like this shown below -
+for(each record as r1) in employee{
+	flag <- 1;
+	for(each record as r2) in employee{
+		if(r1 > r2){
+			flag <- 0;
+			break;
+		}
+	}
+	if(flag = 1) print r1;
+}
+
+select * from employee where salary < any(select salary from employee);
+
+The above query runs something like this shown below -
+for(each record as r1) in employee{
+	for(each record as r2) in employee{
+		if(r1 < r2){
+			print r1;
+			break;
+		}
+	}
+}
+
+5.Write the equivalent query of 'select city from employee group by city' without using group by clause.
+ANS:
+select distinct(city) from employee;
+
+CITY
+----------
+Bihar
+Gurgaon
+Mumbai
+Kolkata
+Gujrat

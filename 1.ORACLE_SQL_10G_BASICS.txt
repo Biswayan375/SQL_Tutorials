@@ -1,0 +1,183 @@
+Syntax of creating a table :-
+
+syntax :		
+			CREATE TABLE STUDENT
+			(
+				NAME VARCHAR2(20),
+				ROLL VARCHAR2(20),
+				MARKS NUMBER(20),
+				DOB DATE
+			);
+CMD prmpt I/P-O/P :
+SQL> CREATE TABLE STUDENT(NAME VARCHAR2(20),ROLL VARCHAR2(20),MARKS NUMBER(20),DOB DATE);
+
+Table created.
+
+Syntax of insert values into the table :-
+
+syntax :
+			INSERT INTO STUDENT VALUES
+			(
+				'&NAME','&ROLL',&MARKS,'&DOB'
+			);
+CMD prmpt I/P-O/P :
+SQL> INSERT INTO STUDENT VALUES
+  2  (
+  3  '&NAME','&ROLL',&MARKS,'&DOB'
+  4  );
+Enter value for name: NIL
+Enter value for roll: C/008
+Enter value for marks: 40
+Enter value for dob: 01-JAN-1999
+old   3: '&NAME','&ROLL',&MARKS,'&DOB'
+new   3: 'NIL','C/008',40,'01-JAN-1999'
+
+1 row created.
+
+SQL> /
+Enter value for name: SUBHAM
+Enter value for roll: C/010
+Enter value for marks: 43
+Enter value for dob: 12-FEB-1998
+old   3: '&NAME','&ROLL',&MARKS,'&DOB'
+new   3: 'SUBHAM','C/010',43,'12-FEB-1998'
+
+1 row created.
+
+SQL> /
+Enter value for name: SUNIL
+Enter value for roll: C/018
+Enter value for marks: 39
+Enter value for dob: 4-MAR-2000
+old   3: '&NAME','&ROLL',&MARKS,'&DOB'
+new   3: 'SUNIL','C/018',39,'4-MAR-2000'
+
+1 row created.
+
+SQL> /
+Enter value for name: SUBHRA
+Enter value for roll: C/020
+Enter value for marks: 40
+Enter value for dob: 4-JUN-2000
+old   3: '&NAME','&ROLL',&MARKS,'&DOB'
+new   3: 'SUBHRA','C/020',40,'4-JUN-2000'
+
+1 row created.
+
+Syntax to display a table :-
+			SELECT * FROM STUDENT;
+CMD prmpt I/P-O/P :
+SQL> SELECT * FROM STUDENT;
+
+NAME                 ROLL                      MARKS DOB
+-------------------- -------------------- ---------- ---------
+NIL                  C/008                        40 01-JAN-99
+SUBHAM               C/010                        43 12-FEB-98
+SUNIL                C/018                        39 04-MAR-00
+SUBHRA               C/020                        40 04-JUN-00
+SQL> SELECT NAME,ROLL FROM STUDENT;
+
+NAME                 ROLL
+-------------------- --------------------
+NIL                  C/008
+SUBHAM               C/010
+SUNIL                C/018
+SUBHRA               C/020
+Syntax to describe the table :-
+			DESC STUDENT
+Cmd prmpt I/P-O/P :
+SQL> DESC STUDENT
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ NAME                                               VARCHAR2(20)
+ ROLL                                               VARCHAR2(20)
+ MARKS                                              NUMBER(20)
+ DOB                                                DATE
+
+Syntax to drop the table :-
+			DROP TABLE STUDENT;
+Cmd prmpt I/P-O/P :
+SQL> DROP TABLE STUDENT;
+
+Table dropped.
+
+The concept of primary key :-
+			CREATE TABLE STUDENT
+			(
+				NAME VARCHAR2(20),
+				ROLL VARCHAR2(20),
+				MARKS NUMBER(20),
+				DOB DATE
+			);
+In this case the name, roll, marks, dob or anything can be given same to any other. But if you think, a name can be same, marks can be same or dob can also be same for any two students but the roll cannot be same as it is an unique identity of a student as we can say for the employee id of an employee. Now if we make roll a promary key, then it cannot be given NULL or same as any other. So, lets see it.
+
+SQL> CREATE TABLE STUDENT
+  2  (
+  3  NAME VARCHAR2(20),
+  4  ROLL VARCHAR2(20) PRIMARY KEY,
+  5  MARKS NUMBER(20),
+  6  DOB DATE
+  7  );
+
+Table created.
+
+SQL> DESC STUDENT
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ NAME                                               VARCHAR2(20)
+ ROLL                                      NOT NULL VARCHAR2(20)                  
+ MARKS                                              NUMBER(20)
+ DOB                                                DATE
+
+//Making roll the primary key you can see the difference between the previous deccription and this descriptionption. Now the roll section has become not null.
+
+SQL> INSERT INTO STUDENT VALUES('&NAME','&ROLL',&MARKS,'&DOB');
+Enter value for name: NIL
+Enter value for roll: C/008
+Enter value for marks: 40
+Enter value for dob: 12-JAN-1999
+old   1: INSERT INTO STUDENT VALUES('&NAME','&ROLL',&MARKS,'&DOB')
+new   1: INSERT INTO STUDENT VALUES('NIL','C/008',40,'12-JAN-1999')
+
+1 row created.
+
+SQL> /
+Enter value for name: NIL
+Enter value for roll: C/009                             //Everything except roll is same here with the previous one though it will not show error as only roll is the primary key.
+Enter value for marks: 40
+Enter value for dob: 12-JAN-1999
+old   1: INSERT INTO STUDENT VALUES('&NAME','&ROLL',&MARKS,'&DOB')
+new   1: INSERT INTO STUDENT VALUES('NIL','C/009',40,'12-JAN-1999')
+
+1 row created.
+
+SQL> /
+Enter value for name: SUBHAM
+Enter value for roll: C/009                              //When the roll which is unique is given same to othes, it will show error.
+Enter value for marks: 39
+Enter value for dob: 15-FEB-2000
+old   1: INSERT INTO STUDENT VALUES('&NAME','&ROLL',&MARKS,'&DOB')
+new   1: INSERT INTO STUDENT VALUES('NIL','C/009',39,'1-FEB-2000')
+INSERT INTO STUDENT VALUES('NIL','C/009',39,'1-FEB-2000')
+*
+ERROR at line 1:
+ORA-00001: unique constraint (SYSTEM.SYS_C003995) violated
+
+
+If we want to make primary key more than one elements then we can create the table as shown below.
+				CREATE TABLE STUDENT
+			(
+				NAME VARCHAR2(20),
+				ROLL VARCHAR2(20),
+				MARKS NUMBER(20),
+				DOB DATE,
+				PRIMARY KEY(NAME,ROLL) 
+			);
+
+
+
+[	When more than one elements are made primary key, then it is called composite primary key.	]
+INSERT INTO STUDENT VALUES('NIL','C/008',40,'1-JAN-1999');
+INSERT INTO STUDENT VALUES('SUBHAM','C/010',43,'12-FEB-1998');
+INSERT INTO STUDENT VALUES('SUNIL','C/018',39,'4-MAR-1900');
+INSERT INTO STUDENT VALUES('SUBHRA','C/020',40,'4-JUN-1900');

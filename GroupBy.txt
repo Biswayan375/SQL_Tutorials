@@ -1,0 +1,58 @@
+E_ID  NAME                     SALARY CITY       DOB
+----- -------------------- ---------- ---------- ---------
+E07   Ajay                       3000 Kolkata    12-JAN-00
+E19   Bijay                      3000 Gurgaon    01-JUL-10
+E20   Roy                        5000 Bihar      18-FEB-12
+E48   Ram                        4350 Gurgaon    12-JAN-02
+E13   Sam                        4100 Mumbai     18-MAY-07
+E14   Sunil                      4517 Gujrat     16-JUN-99
+E50   Sunil                      4300 Kolkata    12-AUG-01
+
+query: select city from employee group by city;
+output: 
+CITY
+----------
+Bihar
+Gurgaon
+Mumbai
+Kolkata
+Gujrat
+
+[Only the field that is used with group by is to be given after select keyword. Otherwise only aggregate functions are allowed and no other fields.]
+
+Ex1. Display the number of employees who belong to a city along with the cityname.
+ANS:
+SQL> select city, count(*) from employee group by city;
+
+CITY         COUNT(*)
+---------- ----------
+Bihar               1
+Gurgaon             2
+Mumbai              1
+Kolkata             2
+Gujrat              1
+
+Ex2. Find out the details of the employees who belongs to such cities from where greater than one employees belong to.
+ANS:
+select * from employee 
+where city in(select city from employee group by city 
+	having count(*) > 1)order by city;
+E_ID  NAME                     SALARY CITY       DOB
+----- -------------------- ---------- ---------- ---------
+E48   Ram                        4350 Gurgaon    12-JAN-02
+E19   Bijay                      3000 Gurgaon    01-JUL-10
+E50   Sunil                      4300 Kolkata    12-AUG-01
+E07   Ajay                       3000 Kolkata    12-JAN-00
+
+[This having is just like where but it is only to be used with group by. Because if you think of it then you can understand that when we say 'select * from table', it goes through the whole table for once and then it shows the results. So, when we say 'select * from table where condition', it checks for the condition for each and every entry in the table once, if it satisfies then is displays the result otherwise not. But when we use group by like 'select * from employee group by field' the table can be imagined as divided by the field given after group by clause. And from that sub-table (divided table by the given field) if we want to get results based on condition, we use having instead of where. In simple words, where works on the whole table and having works on the sub-table that is divided by the field given after group by clause]
+
+Ex3. Find out the details of the employees who belongs to such cities from where greater than one employees belong to. But don't show results from city Gurgaon.
+ANS:
+select * from employee 
+where city in(select city from employee group by city 
+	having count(*) > 1 and city <> 'Gurgaon')order by city;
+
+E_ID  NAME                     SALARY CITY       DOB
+----- -------------------- ---------- ---------- ---------
+E07   Ajay                       3000 Kolkata    12-JAN-00
+E50   Sunil                      4300 Kolkata    12-AUG-01

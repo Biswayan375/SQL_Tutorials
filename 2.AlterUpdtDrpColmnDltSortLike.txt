@@ -1,0 +1,229 @@
+create table employee(
+	e_id varchar(5),
+	name varchar(20),
+	salary number(5),
+	city varchar(10),
+	dob date,
+	primary key(e_id, name)
+);
+
+insert into employee values('E07', 'Ajay', 3000, 'Kolkata', '12-JAN-20');
+insert into employee values('E19', 'Bijay', 3219, 'Gurgaon', '01-JUL-10');
+insert into employee values('E20', 'Roy', 5270, 'Kolkata', '18-FEB-12');
+insert into employee values('E48', 'Ram', 4350, 'UP', '12-JAN-02');
+insert into employee values('E13', 'Sam', 4100, 'Mumbai', '18-MAY-07');
+
+
+Syntax to update an existing table :-
+
+SQL> UPDATE EMP SET SALARY=8000 WHERE NAME='BIJAY';
+
+1 row updated.
+
+SQL> SELECT * FROM EMP;
+
+E_ID  NAME           SALARY CITY       DOB
+----- ---------- ---------- ---------- ---------
+E01   AJAY             3000 KOLKATA    12-JAN-20
+E02   ROY              5000 MUMBAI     01-JUL-10
+E03   SAM              7000 BANGALORE  18-FEB-12
+E04   RAM              6000 KOLKATA    12-JAN-02
+E05   BIJAY            8000 PUNE       18-MAY-07
+
+Syntax to alter the table :-
+
+SQL> ALTER TABLE EMP ADD(PAN_NUM VARCHAR2(10));
+
+Table altered.
+
+SQL> SELECT * FROM EMP;
+
+E_ID  NAME           SALARY CITY       DOB       PAN_NUM
+----- ---------- ---------- ---------- --------- ----------
+E01   AJAY             3000 KOLKATA    12-JAN-20
+E02   ROY              5000 MUMBAI     01-JUL-10
+E03   SAM              7000 BANGALORE  18-FEB-12
+E04   RAM              6000 KOLKATA    12-JAN-02
+E05   BIJAY            7000 CHENNAI    18-MAY-07             
+
+Adding PAN_NUM :-
+
+UPDATE EMP SET PAN_NUM='Y7892C' WHERE E_ID='E01';
+UPDATE EMP SET PAN_NUM='Y7532B' WHERE E_ID='E02';
+UPDATE EMP SET PAN_NUM='Y7422A' WHERE E_ID='E03';
+UPDATE EMP SET PAN_NUM='Y7552D' WHERE E_ID='E04';
+UPDATE EMP SET PAN_NUM='Y7432C' WHERE E_ID='E05';
+
+SQL> SELECT * FROM EMP;
+
+E_ID  NAME           SALARY CITY       DOB       PAN_NUM
+----- ---------- ---------- ---------- --------- ----------
+E01   AJAY             3000 KOLKATA    12-JAN-20 Y7892C
+E02   ROY              5000 MUMBAI     01-JUL-10 Y7532B
+E03   SAM              7000 BANGALORE  18-FEB-12 Y7422A
+E04   RAM              6000 KOLKATA    12-JAN-02 Y7552D
+E05   BIJAY            7000 CHENNAI    18-MAY-07 Y7432C
+
+Syntax to delete a column :-
+
+SQL> ALTER TABLE EMP DROP COLUMN PAN_NUM;
+
+Table altered.
+
+SQL> SELECT * FROM EMP;
+
+E_ID  NAME           SALARY CITY       DOB
+----- ---------- ---------- ---------- ---------
+E01   AJAY             3000 KOLKATA    12-JAN-20
+E02   ROY              5000 MUMBAI     01-JUL-10
+E03   SAM              7000 BANGALORE  18-FEB-12
+E04   RAM              6000 KOLKATA    12-JAN-02
+E05   BIJAY            7000 CHENNAI    18-MAY-07
+
+To find the E_ID and NAME of the employees whose salary is in between given range :-
+
+SQL> SELECT E_ID,NAME FROM EMP WHERE SALARY<8000 AND SALARY>6000;
+
+E_ID  NAME
+----- ----------
+E03   SAM
+E05   BIJAY
+
+Or, we can do it in more simplier way like
+
+SQL> SELECT E_ID,NAME FROM EMP WHERE SALARY BETWEEN 6000 AND 8000;
+
+E_ID  NAME
+----- ----------
+E03   SAM
+E04   RAM
+E05   BIJAY
+
+Syntax to find the employees who live in either placeA or placeB :-
+
+SQL> SELECT NAME FROM EMP WHERE CITY='KOLKATA' OR CITY='MUMBAI';
+
+NAME
+----------
+AJAY
+ROY
+RAM
+
+Or, we can do it like,
+
+SQL> SELECT NAME FROM EMP WHERE CITY IN('KOLKATA','MUMBAI','CHENNAI');
+
+NAME
+----------
+AJAY
+ROY
+RAM
+BIJAY
+
+Syntax to find people who do not live in either placeA or placeB :-
+
+SQL> SELECT NAME FROM EMP WHERE CITY NOT IN('BANGALORE','CHENNAI');
+
+NAME
+----------
+AJAY
+ROY
+RAM
+
+Syntax to find people whose name is starting or ending with searched letter :-
+
+SQL> SELECT NAME FROM EMP WHERE NAME LIKE 'S%';         //This command will show the name of the employees whose name starts with 'S'.
+
+NAME
+----------
+SAM
+
+SQL> SELECT NAME FROM EMP WHERE NAME LIKE '%Y';         //This command will show the name of the employees whose name ends with 'Y'.
+
+NAME
+----------
+AJAY
+ROY
+BIJAY
+
+SQL> SELECT NAME FROM EMP WHERE NAME LIKE '_A%';        //One underscore and then searched letter means it will show those employee's names which has 'A' as second letter.
+
+NAME
+----------
+SAM
+RAM
+
+SQL> SELECT NAME FROM EMP WHERE NAME LIKE '__A%';      //Two underscore means it will show the names which has 'A' as third letter.
+
+NAME
+----------
+AJAY
+
+SQL> SELECT NAME FROM EMP WHERE NAME LIKE '%A%';       //This shows all the names having 'A'.
+
+NAME
+----------
+AJAY
+SAM
+RAM
+BIJAY
+
+Arranging the table orderly :-
+
+SQL> SELECT * FROM EMP ORDER BY NAME;                //This command will sort the table alphabetically according to name.
+
+E_ID  NAME           SALARY CITY       DOB
+----- ---------- ---------- ---------- ---------
+E01   AJAY             3000 KOLKATA    12-JAN-20
+E05   BIJAY            7000 CHENNAI    18-MAY-07
+E04   RAM              6000 KOLKATA    12-JAN-02
+E02   ROY              5000 MUMBAI     01-JUL-10
+E03   SAM              7000 BANGALORE  18-FEB-12
+
+SQL> SELECT * FROM EMP ORDER BY SALARY;              //This command will sort the table in ascending order according to salary.
+
+E_ID  NAME           SALARY CITY       DOB
+----- ---------- ---------- ---------- ---------
+E01   AJAY             3000 KOLKATA    12-JAN-20
+E02   ROY              5000 MUMBAI     01-JUL-10
+E04   RAM              6000 KOLKATA    12-JAN-02
+E05   BIJAY            7000 CHENNAI    18-MAY-07
+E03   SAM              7000 BANGALORE  18-FEB-12
+
+Now, we change the employee name 'ROY' with 'RAM' and in this case sorting according to employee name is not possible as those two names are same. So, we have to write it in a way where if sorting according to name is not possible, sorting according to salary or according to something else will happen. Or in other words, sorting according to salary or something else will happen with the employees having same name.
+
+SQL> SELECT * FROM EMP ORDER BY NAME,SALARY;
+
+E_ID  NAME           SALARY CITY       DOB
+----- ---------- ---------- ---------- ---------
+E01   AJAY             3000 KOLKATA    12-JAN-20
+E05   BIJAY            7000 CHENNAI    18-MAY-07
+E02   RAM              5000 MUMBAI     01-JUL-10
+E04   RAM              6000 KOLKATA    12-JAN-02
+E03   SAM              7000 BANGALORE  18-FEB-12
+
+SQL> SELECT * FROM EMP ORDER BY SALARY DESC;          //This command will sort the table descendingly according to salary where DESC stands for descending order.
+
+E_ID  NAME           SALARY CITY       DOB
+----- ---------- ---------- ---------- ---------
+E03   SAM              7000 BANGALORE  18-FEB-12
+E05   BIJAY            7000 CHENNAI    18-MAY-07
+E04   RAM              6000 KOLKATA    12-JAN-02
+E02   RAM              5000 MUMBAI     01-JUL-10
+E01   AJAY             3000 KOLKATA    12-JAN-20
+
+Syntax to delete a row :-
+
+SQL> DELETE FROM EMP WHERE E_ID='E02';
+
+1 row deleted.
+
+SQL> SELECT * FROM EMP;
+
+E_ID  NAME           SALARY CITY       DOB
+----- ---------- ---------- ---------- ---------
+E01   AJAY             3000 KOLKATA    12-JAN-20
+E03   SAM              7000 BANGALORE  18-FEB-12
+E04   RAM              6000 KOLKATA    12-JAN-02
+E05   BIJAY            7000 CHENNAI    18-MAY-07
+
