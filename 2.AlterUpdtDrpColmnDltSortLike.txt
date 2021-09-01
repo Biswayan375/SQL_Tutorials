@@ -190,7 +190,9 @@ E04   RAM              6000 KOLKATA    12-JAN-02
 E05   BIJAY            7000 CHENNAI    18-MAY-07
 E03   SAM              7000 BANGALORE  18-FEB-12
 
-Now, we change the employee name 'ROY' with 'RAM' and in this case sorting according to employee name is not possible as those two names are same. So, we have to write it in a way where if sorting according to name is not possible, sorting according to salary or according to something else will happen. Or in other words, sorting according to salary or something else will happen with the employees having same name.
+Now, we change the employee name 'ROY' with 'RAM' and in this case sorting according to employee name is not possible as those two names are same. So, we have
+to write it in a way where if sorting according to name is not possible, sorting according to salary or according to something else will happen. Or in other words,
+sorting according to salary or something else will happen with the employees having same name.
 
 SQL> SELECT * FROM EMP ORDER BY NAME,SALARY;
 

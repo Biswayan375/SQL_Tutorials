@@ -92,7 +92,7 @@ CREATE TABLE STUDENT
 
 // ROLL as primary key - Because ROLL NO. of a student is his/her unique identity to the institution,
 // NOT NULL - This is not defined as primary key but like a primary key this field can also not be left blank.
-// CHECK operator - If age is greater than or equal to 18 the only it will not show an error otherwise the outuput will be error.
+// CHECK operator - If age is greater than or equal to 18 then only it will not show an error otherwise the outuput will be error.
 
 CREATING A SEQUENCE :
 
@@ -230,21 +230,28 @@ NAME
 AJAY SAHA
 BIKASH DAS
 
-[  Now this command gives out the the name of the students whose favourite teacher is supriyo. But what if when the question is give the name of the students whose favourite teacher is only supriyo but not biswajit. Here comes the concept of minus operator. If you notice the table you will find that AJAY SAHA's favourite teacher is not only supriyo but also biswajit.So we can do this like this way.  ]
+[  Now this command gives out the the name of the students whose favourite teacher is supriyo. But what if in the question, given the name of the students
+whose favourite teacher is only supriyo but not biswajit. Here comes the concept of minus operator. If you notice the table you will find that AJAY SAHA's
+favourite teacher is not only supriyo but also biswajit.So we can do this like this way.  ]
 
-SQL>  SELECT (FNAME||' '||LNAME) "NAME" FROM STUDENT S,FAV_TEACHER F WHERE F.ROLL=S.ROLL AND F.TID='T02' MINUS  SELECT (FNAME||' '||LNAME) "NAME" FROM STUDENT S,FAV_TEACHER F WHERE F.ROLL=S.ROLL AND F.TID='T01';
-
-NAME
----------------------
-BIKASH DAS
-
-[  First this command takes the names of the student whose favourite teacher is biswajit and then it takes the name of the students whose favourite teacher is supriyo and then does the minus operation after that the same names from that two output are eliminated and there left only the names whose favourite teacher is only supriyo but not biswajit.  ]
-
-SQL>  SELECT (FNAME||' '||LNAME) "NAME" FROM STUDENT S,FAV_TEACHER F,TEACHER T WHERE S.ROLL=F.ROLL AND T.TID=F.TID AND NAME='SUPRIYO' MINUS SELECT (FNAME||' '||LNAME) "NAME" FROM STUDENT S,FAV_TEACHER F,TEACHER T WHERE S.ROLL=F.ROLL AND T.TID=F.TID AND NAME<>'SUPRIYO';
+SQL>  SELECT (FNAME||' '||LNAME) "NAME" FROM STUDENT S,FAV_TEACHER F WHERE F.ROLL=S.ROLL AND F.TID='T02' MINUS  SELECT (FNAME||' '||LNAME) "NAME"
+FROM STUDENT S,FAV_TEACHER F WHERE F.ROLL=S.ROLL AND F.TID='T01';
 
 NAME
 ---------------------
 BIKASH DAS
 
-[  Now this command minuses the list of students whose favourite teacher is supriyo with the list of students whose favourite teacher is not supriyo giving out the result of the list of the students whose favourite teacher is only supriyo.  ]
+[  First this command takes the names of the student whose favourite teacher is biswajit and then it takes the name of the students whose favourite teacher
+is supriyo and then does the minus operation after that the same names from that two output are eliminated and there left only the names whose favourite 
+teacher is only supriyo but not biswajit.  ]
+
+SQL>  SELECT (FNAME||' '||LNAME) "NAME" FROM STUDENT S,FAV_TEACHER F,TEACHER T WHERE S.ROLL=F.ROLL AND T.TID=F.TID AND NAME='SUPRIYO' MINUS SELECT
+(FNAME||' '||LNAME) "NAME" FROM STUDENT S,FAV_TEACHER F,TEACHER T WHERE S.ROLL=F.ROLL AND T.TID=F.TID AND NAME<>'SUPRIYO';
+
+NAME
+---------------------
+BIKASH DAS
+
+[  Now this command minuses the list of students whose favourite teacher is supriyo with the list of students whose favourite teacher is not supriyo giving out
+the result of the list of the students whose favourite teacher is only supriyo.  ]
 

@@ -109,7 +109,9 @@ The concept of primary key :-
 				MARKS NUMBER(20),
 				DOB DATE
 			);
-In this case the name, roll, marks, dob or anything can be given same to any other. But if you think, a name can be same, marks can be same or dob can also be same for any two students but the roll cannot be same as it is an unique identity of a student as we can say for the employee id of an employee. Now if we make roll a promary key, then it cannot be given NULL or same as any other. So, lets see it.
+In this case the name, roll, marks, dob or anything can be given same to any other. But if you think, a name can be same, marks can be same or dob can also be same
+for any two students but the roll cannot be same as it is an unique identity of a student as we can say for the employee id of an employee. Now if we make roll 
+a promary key, then it cannot be given NULL or same as any other. So, lets see it.
 
 SQL> CREATE TABLE STUDENT
   2  (

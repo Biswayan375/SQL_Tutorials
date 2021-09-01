@@ -1,4 +1,5 @@
-Aggregate functions are never to be used after where clause without any group by function. It can only be used after the select keyword and only with group by after where clause. max, min, avg, count, sum and distinct are the aggregate functions.
+Aggregate functions are never to be used after where clause without any group by function. It can only be used after the select keyword and only with group by after
+where clause. max, min, avg, count, sum and distinct are the aggregate functions.
 
 
 The Table is :-
@@ -96,7 +97,9 @@ E04        RAM                  KOLKATA    10-JAN-02
                                                                                                      1                                                2                           21
                                                                                                 (1 starts)                                        (2 starts)               (2 Ends)(1 Ends)
 
-Here first the no.2 sub-query works and as it says, the highest salary is sorted out. Then the no.1 sub-query comes to work and this time the highest salary is already out of the table, so, here left only the second highest salary which is now sorted out and here the whole operation stops. Similarly we can find the second lowest payment also which is given below.       ]
+Here first the no.2 sub-query works and as it says, the highest salary is sorted out. Then the no.1 sub-query comes to work and this time the highest salary is already
+out of the table, so, here left only the second highest salary which is now sorted out and here the whole operation stops. Similarly we can find the second lowest
+payment also which is given below.       ]
 
 SQL> SELECT E_ID, NAME, CITY, DOB FROM EMP WHERE SALARY IN(SELECT MIN(SALARY) FROM EMP WHERE SALARY NOT IN(SELECT MIN(SALARY) FROM EMP));
 

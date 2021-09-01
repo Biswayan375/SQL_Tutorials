@@ -77,7 +77,8 @@ Syntax to find people who works in searched field using bridge :-
 
 SQL> SELECT NAME FROM EMP,DEP,WORK WHERE EMP.E_ID=WORK.E_ID AND DEP.DID=WORK.DID AND DEP.DNAME='IT';
 
-NAME               //In this we wanted to see the name of the employees who work in IT department.
+//In this we wanted to see the name of the employees who work in IT department.
+NAME               
 ----------
 SAM
 RAM
@@ -137,7 +138,8 @@ HR
 MARKETTING
 IT
 
-[  Now here comes out this problem that it is showing the department name HR twice because two employees from kolkata works in HR department. To solve this problem we can use distinct keyword which in turn gives out the names only once. Lets see how it works.  ]
+[  Now here comes out this problem that it is showing the department name HR twice because two employees from kolkata works in HR department. To solve this
+problem we can use distinct keyword which in turn gives out the names only once. Lets see how it works.  ]
 
 SQL> SELECT DISTINCT DNAME FROM DEP,EMP,WORK WHERE DEP.DID=WORK.DID AND WORK.E_ID=EMP.E_ID AND EMP.CITY='KOLKATA';
 
@@ -164,7 +166,8 @@ E04   RAM              6000 KOLKATA    12-JAN-02
 
 SQL> SELECT * FROM WORK;         //Deleted the employee E05 from EMP table.
 
-DID        E_ID                  //All records of E05 from here is also deleted automatically because of that ON DELETE CASCADE.
+//All records of E05 from here is also deleted automatically because of that ON DELETE CASCADE.
+DID        E_ID                  
 ---------- ----------
 D01        E01
 D01        E04
@@ -184,7 +187,9 @@ DROP TABLE EMP
 ERROR at line 1:
 ORA-02449: unique/primary keys in table referenced by foreign keys
 
-[  The work table has the foreign key which is the primary key of the EMP table. So, we can say that the EMP table is the parent table and the work table is the child table of it. So, without deleting the child table we cannot delete the parent table. Here we can use DELETE command to delete each row of the parent table but if you notice you will see that in this way only the rows of the table will be deleted but the table will not be deleted.  ]
+[  The work table has the foreign key which is the primary key of the EMP table. So, we can say that the EMP table is the parent table and the work table is
+the child table of it. So, without deleting the child table we cannot delete the parent table. Here we can use DELETE command to delete each row of the parent
+table but if you notice you will see that in this way only the rows of the table will be deleted but the table will not be deleted.  ]
 
 SQL> DROP TABLE WORK;      //First child is dropped.
 
