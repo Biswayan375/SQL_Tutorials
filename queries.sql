@@ -135,8 +135,16 @@ select e.e_id, e.name, count(*) as "No. of deps. assigned" from employee e, work
 group by w.eid, e.e_id, e.name
 having
 	w.eid = e.e_id;
-	
+
+-- The following 2 examples demonstrate group by with more than one columns	
+
 -- Give out the name and id of the employee along with the number of departments assigned to them
 select e.e_id, e.name, count(*) as "No. of deps. assigned" from employee e, work w where w.eid = e.e_id
 group by
 	e.e_id, e.name;
+	
+-- Find the name of the departments along with the no of employees work in that department
+select d.name, count(*) from department d, work w
+where
+	w.did = d.d_id
+	group by d.d_id, d.name;

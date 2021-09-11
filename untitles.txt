@@ -1,0 +1,10 @@
+SQL> select w.eid, count(*) from employee e, work w
+  2  group by w.eid;
+
+EID     COUNT(*)
+----- ----------
+E03            7
+E04           14
+E05            7
+E01           14
+E02            7

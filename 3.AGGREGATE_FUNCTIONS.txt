@@ -1,5 +1,5 @@
 Aggregate functions are never to be used after where clause without any group by function. It can only be used after the select keyword and only with group by after
-where clause. max, min, avg, count, sum and distinct are the aggregate functions.
+having clause. max, min, avg, count, sum and distinct are the aggregate functions.
 
 
 The Table is :-
