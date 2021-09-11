@@ -131,20 +131,67 @@ where
 		e.city = 'Kolkata');
 		
 
-select e.e_id, e.name, count(*) as "No. of deps. assigned" from employee e, work w
-group by w.eid, e.e_id, e.name
-having
-	w.eid = e.e_id;
+-- Find out the highest salary department wise and show the details of the employee who is taking that salary
 
--- The following 2 examples demonstrate group by with more than one columns	
+	-- This below query finds out the department name along with department ID and the maximum paid salary in that department
+select d.name, d.d_id, max(e.salary) as "Max_paid_salary" from employee e, department d, work w
+where
+	w.did = d.d_id and
+	e.e_id = w.eid
+group by
+	d.d_id, d.name;
+
+	-- Now incorporating the above query with the query that will give the employee details along with department names
+select e.e_id, e.name, e.salary, d.d_id, d.name from employee e, department d where 
+(e.salary, d.d_id) in (
+	select max(e.salary), d.d_id from employee e, department d, work w
+	where 
+		e.e_id = w.eid and
+		d.d_id = w.did
+	group by
+		d.d_id
+);
+
+	-- Some other way of doing the same thing
+select mixed."Max_paid_salary", e.name, d.name, mixed.d_id from (
+	select d.name, d.d_id, max(e.salary) as "Max_paid_salary" from employee e, department d, work w
+	where
+		w.did = d.d_id and
+		e.e_id = w.eid
+	group by
+		d.d_id, d.name
+) mixed, employee e, department d
+where
+	e.salary = mixed."Max_paid_salary" and mixed.d_id = d.d_id;
+
+-- The following 2 examples demonstrate group by with more than one columns
 
 -- Give out the name and id of the employee along with the number of departments assigned to them
-select e.e_id, e.name, count(*) as "No. of deps. assigned" from employee e, work w where w.eid = e.e_id
+select e.e_id, e.name, count(*) as "No. of deps. assigned" from employee e, work w
+where
+	w.eid = e.e_id
 group by
 	e.e_id, e.name;
 	
 -- Find the name of the departments along with the no of employees work in that department
-select d.name, count(*) from department d, work w
+select d.name, count(*) as "No. of Employees" from department d, work w
 where
 	w.did = d.d_id
-	group by d.d_id, d.name;
+group by d.d_id, d.name
+order by d.d_id;
+
+	-- An alternative way of doing the same above thing
+	select mixed.d_id, d.name, mixed."No. of Employees" from
+	(
+		select d.d_id, count(*) as "No. of Employees" from department d, work w
+		where
+			w.did = d.d_id
+		group by d.d_id
+	) mixed, department d
+	where d.d_id = mixed.d_id;
+
+
+
+
+
+

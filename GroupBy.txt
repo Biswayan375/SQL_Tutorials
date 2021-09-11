@@ -130,3 +130,23 @@ ANS:
 select e.e_id, e.name, count(*) as "No. of deps. assigned" from employee e, work w where w.eid = e.e_id
 group by
 	e.e_id, e.name;
+
+Another approach:
+select e.e_id, e.name, mixed."No. of deps. assigned" from employee e, 
+(
+	select e.e_id, count(*) as "No. of deps. assigned" from employee e, work w
+	where
+		w.eid = e.e_id
+	group by
+		e.e_id
+) mixed
+where
+	mixed.e_id = e.e_id;
+
+[This 2nd approach may seem lengthy than the previous one that uses multiple fields after group by clause but it is much more simpler(easy to understand) and robust.
+I used the term robust on purpose cause, as you know there is a restriction of using the group by clause that is you cannot use a field other than the one given
+after the group by or some aggregate function, it becomes necessary to add multiple fields after the group by when you want to keep the aggregate output of the
+group by query. But adding multiple fields after group by also adds its own restrictions. If you want to group by cityname and you want to keep some other fields,
+say e_id or name along with the output of some aggregate function that is used after select keyword then you need to add that 'other field' after group by along with
+cityname which may not behave as you want it to. Eventually this 2nd lengthy method becomes the ninja technique when showing other fields that are not given after
+group by clause.]
