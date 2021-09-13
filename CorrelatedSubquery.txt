@@ -1,0 +1,60 @@
+General structure of a subquery: (outerSubquery) connector (innerSubquery)
+
+First, the innerSubquery executes, returns some data and based on that data, the outer subquery executes. Here the innerSubquery
+has zero knowledge of the outer subquery. Second notable thing about this kind of sub queries is that the inner query runs only
+once. An examples can be given as -
+					select * from employee 
+					where 
+						salary = (
+							select max(salary) from employee
+						);
+In the above example, the connector between inner query and outer query is '='.
+
+
+Correlated subqueries are subqueries with the inner query having knowledge about the outer query. For example or for the demonstration
+of the usefulness of correlated subqueries, lets take a problem. Find out the details of the employee who gets paid the nth highest of
+all.
+SOLUTION =>
+Lets forget about SQL for a moment and think about programming. It you are given an array of elements and asked to find out the
+3rd largest element in the array then what you will do naively without thinking about any kind of optimization thing? A solution
+may be is to find out such element which has exactly 2 elements greater than itself. The loop for this may be written like -
+				for(i = 0; i < sizeOfArray; i++){
+					count = 0;
+					for(j = 0; j < sizeOfArray; j++) if(array[j] > array[i]) count++;
+	
+					if(count == 2){
+						print("The 3rd highest element is: ", array[i]);
+						break;
+					}
+				}
+Now, what is happenning here is for each iteration of the outer loop, the inner loop checks for all the elements in the array. This
+is exactly the functionality that correlated subquery provides us. For each record from outer query, all of the records in the inner
+query is checked. The above nested for loop can be written in SQL with correlated subquery like -
+				select e1.* from employee e1
+				where
+				(
+					select count(e2.salary) from employee e2
+					where
+					e2.salary > e1.salary
+				) = 2;
+The outer query selects each and every record in employee table one by one. For that each record the inner query runs to check all the 
+records in the same employee table and returns the count of the records that has its salary greater than the salary from that record
+which was previously selected by the outer query. If the count is 2 then it the 3rd highest. In this same approach, we can easily find
+out nth highest salary. But here us a small catch, that is, if there are records with multiple records having same salary. Consider
+the following table - 
+				NAME           SALARY
+				---------- ----------
+				Jadu             2500
+				Madhu            2800
+				Ram              3000
+				Sam              3000
+In this, if I want to find the 3rd highest salary, then the answer should be 2500. But I run the above SQL query, it will give me 2800.
+Because there are two records with salary 3000 and it will treat them distinctly if not use the distinct aggregate function in my query.
+So, the final query becomes -
+				select e1.* from employee e1
+				where
+				(
+					select count(distinct(e2.salary)) from employee e2
+					where
+					e2.salary > e1.salary
+				) = 2;
