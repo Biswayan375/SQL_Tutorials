@@ -1,0 +1,78 @@
+DRY(Do Not Repeat Yourself) is a crazy concept in programming which enables you to write less and do more. Functions, classes etc. they all implement this
+conception, DRY. In SQL also, the need of DRY and techniques which implement DRY in necessary as with increasing complexity of the query, it often requires
+the same query to be re-written. Lets talk about the problem first and then the solution.
+
+There are 2 tables as follows:
+
+PID PNAME           COMPANY         PRICE COLOR      TYPE
+--- --------------- ---------- ---------- ---------- ---------------
+p01 air conditioner lloyd            9900 white      electronic
+p02 air conditioner samsung          8900 grey       electronic
+p03 smartphone      samsung          7500 white      electronic
+p04 smartphone      samsung          7500 black      electronic
+p05 smartphone      realme           8000 black      electronic
+p06 smartphone      redmi            9000 black      electronic
+p07 table           indigo           6700 wooden     furniture
+p08 bed             indigo           9800 wooden     furniture
+
+
+SID PID SALES_DAT   QUANTITY
+--- --- --------- ----------
+s01 p08 01-SEP-17          2
+s01 p07 01-SEP-17          2
+s03 p07 22-SEP-17          3
+s03 p08 22-SEP-17          1
+s04 p03 12-AUG-17          3
+s04 p05 12-AUG-17          5
+s04 p06 10-SEP-17          4
+s04 p03 12-AUG-17          3
+s08 p05 12-SEP-17          2
+s07 p06 16-SEP-17          3
+s02 p01 12-MAR-17          2
+s05 p02 12-APR-17          1
+s06 p01 14-MAY-17          2
+s02 p02 12-MAR-17          2
+s06 p01 02-APR-18          2
+s02 p02 04-MAY-18          3
+
+Now, the question is to find the company to earn the maximum number of air conditioner sales in the year 2017. If you look at the table for a couple of munutes, you
+can easily get that the answer is lloyd. But the query for this should be like:
+
+				select p.company from product p,
+				(
+					select s.pid, sum(s.quantity) as "Total sold" from sales s, product p
+						where
+							p.pid = s.pid and
+							s.sales_date between '01-jan-17' and '31-dec-17' and
+							p.pname = 'air conditioner'
+						group by s.pid
+				) mixed
+				where mixed.pid = p.pid and
+					mixed."Total sold" in(
+						select max(sum(s.quantity)) as "Total sold" from sales s, product p
+							where
+								p.pid = s.pid and
+								s.sales_date between '01-jan-17' and '31-dec-17' and
+								p.pname = 'air conditioner'
+							group by s.pid
+					);
+
+Well, it is not efficient at all and also you will not want to do this kind of queries in your life twice. The same query is written twice in the above query and
+without that, finding the solution is not something I though of(But if you know, surely let me know!). The with clause made my life easier. You probably know how to
+give aliases to table names, like employee e, product p, sales s etc. By using the with clause you can literally give an alias name to some query and use that query
+further in your main query like calling functions. Here is the syntax of with clause for the above query. It should be clear how to use it by this example -
+
+				with tempTable as (
+				select s.pid, sum(s.quantity) as "Total sold" from sales s, product p
+				where
+					p.pid = s.pid and
+					s.sales_date between '01-jan-17' and '31-dec-17' and
+					p.pname = 'air conditioner'
+				group by s.pid
+				)
+				select p.company from product p, tempTable t
+				where
+					p.pid = t.pid and
+					t."Total sold" = (
+					select max(tempTable."Total sold") from tempTable
+				);
