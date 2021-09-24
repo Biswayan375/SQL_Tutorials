@@ -278,3 +278,128 @@
 			t."Total sold" = (
 				select max(tempTable."Total sold") from tempTable
 			);
+
+-- PDF Page No.: 8, Ques No.: 2
+	-- cab table
+	create table cab(
+		cno number(2),
+		model varchar2(15),
+		color varchar2(10),
+		purchase_date date,
+		primary key(cno)
+	);
+	
+	insert into cab values(1, 'Tata Hexa', 'black', '12-aug-2010');
+	insert into cab values(2, 'Audi R8', 'red', '29-nov-2008');
+	insert into cab values(3, 'Ford Eco Sport', 'white', '12-jul-2009');
+	insert into cab values(4, 'Audi A5', 'white', '2-may-2010');
+	
+	-- driver table
+	create table driver(
+		did number(2),
+		dname varchar2(10),
+		phone number(10),
+		rating number(1),
+		age number(2),
+		primary key(did)
+	);
+	
+	insert into driver values(1, 'Ramesh', 1234567890, 3, 26);
+	insert into driver values(2, 'Suresh', 1234567890, 4, 25);
+	insert into driver values(3, 'Vim', 1234567890, 4, 22);
+	insert into driver values(4, 'Nayek', 1234567890, 5, 27);
+	insert into driver values(5, 'Samrat', 1234567890, 5, 25);
+	insert into driver values(6, 'Guru', 1234567890, 5, 22);
+	
+	-- allotted table
+	create table allotted(
+		cno number(2),
+		did number(2),
+		"date" date,
+		foreign key(cno) references cab(cno) on delete cascade,
+		foreign key(did) references driver(did) on delete cascade
+	);
+	
+	insert into allotted values(2, 1, '02-jul-2018');
+	insert into allotted values(4, 3, '12-jan-2018');
+	insert into allotted values(1, 2, '15-sep-2018');
+	insert into allotted values(4, 5, '02-jan-2018');
+	insert into allotted values(4, 6, '12-may-2018');
+	insert into allotted values(3, 4, '12-feb-2020');
+	insert into allotted values(1, 5, '12-dec-2020');
+	insert into allotted values(2, 3, '24-sep-2021');
+	insert into allotted values(4, 6, '24-sep-2021');
+	insert into allotted values(1, 1, '24-sep-2021');
+	
+	-- Query1: Find average age of all drivers who have driven Audi A5
+	-- TO BE NOTED: The use of to_date(). Dates cannot be compared only using '=' or '<>'.
+		-- (Using scalar subquery)
+		select avg(age) from driver
+		where
+			did in(
+				select did from allotted
+				where
+					cno in(
+						select cno from cab
+						where
+							model = 'Audi A5'
+					) and
+					"date" <> to_date((select sysdate from dual))
+				group by
+					cno, did
+			);
+		-- (Using bridge / join)
+		select avg(distinct(mixed.age)) as "Avg. age" from
+		(
+			select d.age from driver d, allotted a, cab c
+			where
+				d.did = a.did and
+				c.cno = a.cno and
+				c.model = 'Audi A5' and
+				a."date" <> to_date((select sysdate from dual))
+		) mixed;
+			
+	-- Query2: Display details of all cabs which have been driven by the driver with highest rating in january, 2018
+		-- (Using scalar subquery)
+		select * from cab
+		where
+			cno in(
+				select cno from allotted
+				where
+					did in(
+						select did from driver
+						where
+							rating in(select max(rating) from driver)
+					) and
+					"date" between '01-jan-2018' and '31-jan-2018'
+			);
+		-- (Using bridge / join)
+		select c.* from cab c, allotted a, driver d
+		where
+			c.cno = a.cno and
+			d.did = a.did and
+			d.rating in(
+				select max(rating) from driver
+			) and
+			a."date" between '01-jan-2018' and '31-jan-2018';
+			
+		-- (Using correlated subquery)
+		select c.* from cab c
+		where exists(
+			select * from allotted a
+			where exists(
+				select * from driver d
+				where
+					a.cno = c.cno and
+					a.did = d.did and
+					d.rating = (
+						select max(rating) from driver
+					) and
+					a."date" between '01-jan-18' and '31-jan-18'
+			)
+		);
+		
+	-- Query3: Delete all allotments scheduled today
+		delete from allotted
+		where
+			"date" = to_date((select sysdate from dual));
